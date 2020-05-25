@@ -24,4 +24,6 @@ namespace WebCrawler
             Console.ReadLine();
         }
     }
+
+    //may be threading from outside and not insdie of crawler
 }
