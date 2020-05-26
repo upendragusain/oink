@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Net.Http;
-using System.Threading.Tasks;
 using WebCrawler.Amazon;
-using WebCrawler.Model;
 
 namespace WebCrawler
 {
@@ -28,40 +23,19 @@ namespace WebCrawler
                 new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=10&qid=1590338955&ref=sr_pg_10"),
             };
 
-            var uri = new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks");
-            ConcurrentBag<AmazonBook> _concurrentBooksCollection = new ConcurrentBag<AmazonBook>();
-
-            //todo
-            //An item with the same key has already been added. Key: The Night Fire: The Brand New Ballard and Bosch Thriller (Ballard &amp; Bosch 2)
-            Parallel.ForEach(uriList, (uri) =>
+            var amazonCrawler = new Crawler();
+            int pageCounter = 1;
+            int bookCounter = 0;
+            foreach (var uri in uriList)
             {
-                var amazonCrawler = new Crawler(new HttpClient());
-                var books = amazonCrawler.ProcessAsync(uri);
-                Console.WriteLine(uri);
-                foreach (var item in books.Result)
+                var pageBooks = amazonCrawler.ProcessAsync(uri);
+                pageCounter++;
+                foreach (var item in pageBooks.Result)
                 {
-                    Console.WriteLine($"{item.Title}, {item.Author}, {item.Uri}");
-                    _concurrentBooksCollection.Add(item);
+                    Console.WriteLine($"page/book: {pageCounter}/{++bookCounter}");
+                    Console.WriteLine($"{item.Title}, {item.Uri}, {item.Author}");
                 }
-                Console.WriteLine("----------------------------------------------------------------");
-            });
-
-            //Task[] taskArray = new Task[uriList.Count];
-            //for (int i = 0; i < taskArray.Length-1; i++)
-            //{
-            //    taskArray[i] = Task.Factory.StartNew(() =>
-            //    {
-            //        var amazonCrawler = new Crawler(new HttpClient());
-            //        var books = amazonCrawler.ProcessAsync(uriList[i]);
-            //        foreach (var item in books.Result)
-            //        {
-            //            Console.WriteLine($"Task: {i} - {item.Title}, {item.Author}, {item.Uri}");
-            //            //Console.WriteLine();
-            //            _concurrentBooksCollection.Add(item);
-            //        }
-            //    });
-            //}
-            //Task.WaitAll(taskArray);
+            }
 
             Console.ReadLine();
         }
