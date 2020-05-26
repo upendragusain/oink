@@ -1,30 +1,29 @@
-﻿using MongoDB.Driver;
-using System;
+﻿using Catalog.API.Model;
+using MongoDB.Driver;
 using System.Collections.Generic;
-using System.Text;
+using WebCrawler.Model;
 
 namespace WebCrawler.Infrastructure
 {
-    //public class CatalogDataContext
-    //{
-    //    private readonly IMongoDatabase _database = null;
+    public class CatalogDataContext
+    {
+        private readonly IMongoDatabase _database = null;
 
-    //    public CatalogReadDataContext(string settings)
-    //    {
-    //        var client = new MongoClient(settings.Value.MongoConnectionString);
+        public CatalogDataContext(
+            string mongoDatabase)
+        {
+            var client = new MongoClient();
 
-    //        if (client != null)
-    //        {
-    //            _database = client.GetDatabase(settings.Value.MongoDatabase);
-    //        }
-    //    }
+            if (client != null)
+            {
+                _database = client.GetDatabase(mongoDatabase);
+            }
+        }
 
-    //    public IMongoCollection<CatalogItem> MarketingData
-    //    {
-    //        get
-    //        {
-    //            return _database.GetCollection<CatalogItem>("CatalogReadDataContext");
-    //        }
-    //    }
-    //}
+        public async void InsertManyAsync(IEnumerable<AmazonBook> books)
+        {
+            var booksCollection = _database.GetCollection<AmazonBook>("Books");
+            await booksCollection.InsertManyAsync(books);
+        }
+    }
 }
