@@ -1,7 +1,6 @@
-﻿using Catalog.API.Model;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using System.Collections.Generic;
-using WebCrawler.Model;
+using System.Threading.Tasks;
 
 namespace WebCrawler.Infrastructure
 {
@@ -10,19 +9,19 @@ namespace WebCrawler.Infrastructure
         private readonly IMongoDatabase _database = null;
 
         public CatalogDataContext(
-            string mongoDatabase)
+            string connectionString,
+            string database)
         {
-            var client = new MongoClient();
-
+            var client = new MongoClient(connectionString);
             if (client != null)
             {
-                _database = client.GetDatabase(mongoDatabase);
+                _database = client.GetDatabase(database);
             }
         }
 
-        public async void InsertManyAsync(IEnumerable<AmazonBook> books)
+        public async Task InsertManyAsync<T>(IEnumerable<T> books)
         {
-            var booksCollection = _database.GetCollection<AmazonBook>("Books");
+            var booksCollection = _database.GetCollection<T>("Books");
             await booksCollection.InsertManyAsync(books);
         }
     }
