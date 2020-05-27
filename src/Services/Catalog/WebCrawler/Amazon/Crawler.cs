@@ -15,8 +15,8 @@ namespace WebCrawler.Amazon
         public async Task<IEnumerable<AmazonBook>> ProcessAsync(string pageUrl)
         {
             var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(pageUrl).ConfigureAwait(false);
-            var content = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var response = await httpClient.GetAsync(pageUrl);
+            var content = await response.Content.ReadAsStreamAsync();
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.Load(content);

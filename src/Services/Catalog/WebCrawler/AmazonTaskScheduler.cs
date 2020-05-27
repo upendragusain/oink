@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebCrawler.Amazon;
 using WebCrawler.Infrastructure;
@@ -20,15 +18,15 @@ namespace WebCrawler
         public void ScheduleWithThreads(
             List<List<string>> urls)
         {
-            Parallel.ForEach(urls, async (urlsInThread) =>
+            Parallel.ForEach(urls, (urlsInThread) =>
             {
                 foreach (var uri in urlsInThread)
                 {
-                    Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
+                    //Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
                     Crawler crawler = new Crawler();
-                    var pageBooks = await crawler.ProcessAsync(uri);
-                    await _context.InsertManyAsync(pageBooks);
-                    Console.WriteLine($"Processed {uri}");
+                    var pageBooks =  crawler.ProcessAsync(uri);
+                     _context.InsertMany(pageBooks.Result);
+                    //Console.WriteLine($"Processed {uri}");
                 }
             });
         }
