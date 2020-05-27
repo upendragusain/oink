@@ -24,5 +24,11 @@ namespace WebCrawler.Infrastructure
             var booksCollection = _database.GetCollection<T>("Books");
             await booksCollection.InsertManyAsync(books);
         }
+
+        //public void InsertMany<T>(IEnumerable<T> books)
+        //{
+        //    var booksCollection = _database.GetCollection<T>("Books");
+        //    booksCollection.InsertMany(books);
+        //}
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using WebCrawler.Amazon;
 using WebCrawler.Infrastructure;
@@ -8,42 +9,36 @@ namespace WebCrawler
 {
     public class AmazonTaskScheduler<T>
     {
-        private readonly ICrawler<T> _crawler;
         private readonly CatalogDataContext _context;
 
-        public AmazonTaskScheduler(ICrawler<T> crawler, 
+        public AmazonTaskScheduler(
             CatalogDataContext context)
         {
-            _crawler = crawler;
             _context = context;
         }
 
-        public async Task Schedule()
+        public void ScheduleWithThreads(List<Uri> uris)
         {
-            var uris = SetUpURLList();
-            foreach (var uri in uris)
+            Parallel.ForEach(uris, async (uri) =>
             {
-                var pageBooks = await _crawler.ProcessAsync(uri);
+                Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
+                Crawler crawler = new Crawler();
+                var pageBooks = await crawler.ProcessAsync(uri);
                 await _context.InsertManyAsync(pageBooks);
-            }
+            });
+
+            Console.WriteLine("Processing complete. Press any key to exit.");
         }
 
-        private static List<Uri> SetUpURLList()
+        public void Schedule(List<Uri> uris)
         {
-            List<Uri> urls = new List<Uri>
+            foreach (var uri in uris)
             {
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=2&qid=1590338955&ref=sr_pg_2"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=3&qid=1590338955&ref=sr_pg_3"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=4&qid=1590338955&ref=sr_pg_4"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=5&qid=1590338955&ref=sr_pg_5"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=6&qid=1590338955&ref=sr_pg_6"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=7&qid=1590338955&ref=sr_pg_7"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=8&qid=1590338955&ref=sr_pg_8"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=9&qid=1590338955&ref=sr_pg_9"),
-                new Uri("https://www.amazon.co.uk/s?k=a&i=stripbooks&page=10&qid=1590338955&ref=sr_pg_10")
-            };
-            return urls;
+                Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
+                Crawler crawler = new Crawler();
+                var pageBooks =   crawler.ProcessAsync(uri);
+                _context.InsertManyAsync(pageBooks.Result);
+            }
         }
     }
 }
