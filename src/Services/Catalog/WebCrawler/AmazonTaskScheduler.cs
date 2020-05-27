@@ -17,28 +17,31 @@ namespace WebCrawler
             _context = context;
         }
 
-        public void ScheduleWithThreads(List<Uri> uris)
+        public void ScheduleWithThreads(
+            List<List<string>> urls)
         {
-            Parallel.ForEach(uris, async (uri) =>
+            Parallel.ForEach(urls, async (urlsInThread) =>
             {
-                Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
-                Crawler crawler = new Crawler();
-                var pageBooks = await crawler.ProcessAsync(uri);
-                await _context.InsertManyAsync(pageBooks);
+                foreach (var uri in urlsInThread)
+                {
+                    Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
+                    Crawler crawler = new Crawler();
+                    var pageBooks = await crawler.ProcessAsync(uri);
+                    await _context.InsertManyAsync(pageBooks);
+                    Console.WriteLine($"Processed {uri}");
+                }
             });
-
-            Console.WriteLine("Processing complete. Press any key to exit.");
         }
 
-        public void Schedule(List<Uri> uris)
-        {
-            foreach (var uri in uris)
-            {
-                Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
-                Crawler crawler = new Crawler();
-                var pageBooks =   crawler.ProcessAsync(uri);
-                _context.InsertManyAsync(pageBooks.Result);
-            }
-        }
+        //public void Schedule(List<Uri> uris)
+        //{
+        //    foreach (var uri in uris)
+        //    {
+        //        Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
+        //        Crawler crawler = new Crawler();
+        //        var pageBooks =   crawler.ProcessAsync(uri);
+        //        _context.InsertManyAsync(pageBooks.Result);
+        //    }
+        //}
     }
 }

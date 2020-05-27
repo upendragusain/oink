@@ -12,7 +12,7 @@ namespace WebCrawler.Amazon
     {
         private const string XPATH = @"//div[@data-asin]";//data-asin="0702300179"
 
-        public async Task<IEnumerable<AmazonBook>> ProcessAsync(Uri pageUrl)
+        public async Task<IEnumerable<AmazonBook>> ProcessAsync(string pageUrl)
         {
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(pageUrl).ConfigureAwait(false);

@@ -6,6 +6,6 @@ namespace WebCrawler.Amazon
 {
     public interface ICrawler<T>
     {
-        Task<IEnumerable<T>> ProcessAsync(Uri uri);
+        Task<IEnumerable<T>> ProcessAsync(string uri);
     }
 }
