@@ -20,11 +20,11 @@ namespace WebCrawler
 
             var urls = SetUpURLs();
 
-            Console.WriteLine($"Processing with a single thread");
-            scheduler.Schedule(urls);
+            //Console.WriteLine($"Processing with a single thread");
+            //scheduler.Schedule(urls);
 
-            //Console.WriteLine($"Processing with multiple threads");
-            //scheduler.ScheduleWithThreads(urls);
+            Console.WriteLine($"Processing with multiple threads");
+            scheduler.ScheduleWithThreads(urls);
 
             Console.Read();
         }

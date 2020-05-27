@@ -29,9 +29,9 @@ namespace WebCrawler
 
                 Parallel.ForEach(urls, async (urlsToProcessInThisThread) =>
                 {
-                    try
+                    foreach (var uri in urlsToProcessInThisThread)
                     {
-                        foreach (var uri in urlsToProcessInThisThread)
+                        try
                         {
                             //Console.WriteLine($"Processing {uri} on thread {Thread.CurrentThread.ManagedThreadId}");
                             Crawler crawler = new Crawler();
@@ -39,16 +39,15 @@ namespace WebCrawler
                             if (pageBooks != null && pageBooks.Any())
                                 await _context.InsertManyAsync(pageBooks);
                         }
+                        catch (Exception e)
+                        {
+                            exceptions.Enqueue(e);
+                        }
                     }
-                    // Store the exception and continue with the loop.
-                    catch (Exception e)
-                    {
-                        exceptions.Enqueue(e);
-                    }
-
-                    // Throw the exceptions here after the loop completes.
-                    if (exceptions.Count > 0) throw new AggregateException(exceptions);
                 });
+
+                // Throw the exceptions here after the loop completes.
+                if (exceptions.Count > 0) throw new AggregateException(exceptions);
             }
             catch (AggregateException ae)
             {
@@ -56,7 +55,7 @@ namespace WebCrawler
                 // This is where you can choose which exceptions to handle.
                 foreach (var ex in ae.Flatten().InnerExceptions)
                 {
-                    if (ex is ArgumentException)
+                    if (ex is XPathNotFoundException)
                         Console.WriteLine(ex.Message);
                     else
                         ignoredExceptions.Add(ex);

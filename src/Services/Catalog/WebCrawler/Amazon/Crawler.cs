@@ -31,6 +31,9 @@ namespace WebCrawler.Amazon
 
             htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(XPATH);
 
+            if (htmlNodeCollection == null || !htmlNodeCollection.Any())
+                throw new XPathNotFoundException($"XPath '{XPATH}' for the uri '{pageUrl}' was not found");
+
             if (htmlNodeCollection != null)
             {
                 foreach (HtmlNode htmlNode in htmlNodeCollection)
