@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using WebCrawler.Infrastructure;
 using WebCrawler.Model;
@@ -21,30 +20,24 @@ namespace WebCrawler
 
             var urls = SetUpURLs();
 
-            Console.WriteLine($"Processing with multiple threads");
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            Console.WriteLine($"Processing with a single thread");
+            scheduler.Schedule(urls);
 
-            // Execute the antecedent.
-            Task taskA = Task.Run(() => scheduler.ScheduleWithThreads(urls));
+            //Console.WriteLine($"Processing with multiple threads");
+            //scheduler.ScheduleWithThreads(urls);
 
-            // Execute the continuation when the antecedent finishes.
-            await taskA.ContinueWith(antecedent =>
-            {
-                stopwatch.Stop();
-                Console.WriteLine($"{stopwatch.ElapsedMilliseconds}");
-
-                Console.Read();
-            });
+            Console.Read();
         }
 
-        private static List<List<string>> SetUpURLs(int threadCount = 5, int pagesPerThread = 10)
+        private static List<List<string>> SetUpURLs(
+            int threadsToRun = 5, 
+            int urlsToProcessPerThread = 10)
         {
             List<List<string>> urls = new List<List<string>>();
-            for (int i = 0; i < threadCount; i++)
+            for (int i = 0; i < threadsToRun; i++)
             {
                 var threadUrls = new List<string>();
-                for (int j = pagesPerThread * i; j < (pagesPerThread * i) + pagesPerThread; j++)
+                for (int j = urlsToProcessPerThread * i; j < (urlsToProcessPerThread * i) + urlsToProcessPerThread; j++)
                 {
                     var link = $"https://www.amazon.co.uk/s?k=a&i=stripbooks&page="
                         + (j + 1)

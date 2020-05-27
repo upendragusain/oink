@@ -14,34 +14,46 @@ namespace WebCrawler.Amazon
 
         public async Task<IEnumerable<AmazonBook>> ProcessAsync(string pageUrl)
         {
+            var pageBooks = new List<AmazonBook>();
+
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(pageUrl);
+
+            if (!response.IsSuccessStatusCode)
+                return pageBooks;
+
             var content = await response.Content.ReadAsStreamAsync();
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.Load(content);
 
-            var pageBooks = new List<AmazonBook>();
-            foreach (HtmlNode htmlNode in htmlDocument.DocumentNode.SelectNodes(XPATH))
+            HtmlNodeCollection htmlNodeCollection = null;
+
+            htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(XPATH);
+
+            if (htmlNodeCollection != null)
             {
-                var node_img = htmlNode.Descendants("img").FirstOrDefault();
-                if (node_img != null)
+                foreach (HtmlNode htmlNode in htmlNodeCollection)
                 {
-                    var node_src = node_img.Attributes["src"].Value;
-                    var node_alt = node_img.Attributes["alt"].Value;
-
-                    var node_author = htmlNode.Descendants("a")
-                        .Where(d => d.HasClass("a-size-base") && d.HasClass("a-link-normal"))
-                        .FirstOrDefault();
-
-                    if (node_author != null)
+                    var node_img = htmlNode.Descendants("img").FirstOrDefault();
+                    if (node_img != null)
                     {
-                        pageBooks.Add(new AmazonBook()
+                        var node_src = node_img.Attributes["src"].Value;
+                        var node_alt = node_img.Attributes["alt"].Value;
+
+                        var node_author = htmlNode.Descendants("a")
+                            .Where(d => d.HasClass("a-size-base") && d.HasClass("a-link-normal"))
+                            .FirstOrDefault();
+
+                        if (node_author != null)
                         {
-                            Title = node_alt.Trim(),
-                            Uri = node_src.Trim(),
-                            Author = node_author.InnerText.Trim()
-                        });
+                            pageBooks.Add(new AmazonBook()
+                            {
+                                Title = node_alt.Trim(),
+                                Uri = node_src.Trim(),
+                                Author = node_author.InnerText.Trim()
+                            });
+                        }
                     }
                 }
             }
