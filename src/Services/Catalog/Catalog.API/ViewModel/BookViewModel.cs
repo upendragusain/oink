@@ -14,5 +14,7 @@
 
         public string Publisher { get; set; }
 
+        public byte[] ImageContent { get; set; }
+
     }
 }
