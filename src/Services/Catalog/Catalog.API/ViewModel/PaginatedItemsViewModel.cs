@@ -12,7 +12,11 @@ namespace Catalog.API.ViewModel
 
         public IEnumerable<TEntity> Data { get; private set; }
 
-        public PaginatedItemsViewModel(int pageIndex, int pageSize, long count, IEnumerable<TEntity> data)
+        public PaginatedItemsViewModel(
+            int pageIndex, 
+            int pageSize, 
+            long count, 
+            IEnumerable<TEntity> data)
         {
             PageIndex = pageIndex;
             PageSize = pageSize;

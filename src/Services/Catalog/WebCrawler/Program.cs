@@ -32,8 +32,8 @@ namespace WebCrawler
                 new AmazonTaskScheduler<Book>(catalogDataContext);
 
             var urls = SetUpURLs();
-            int skip = 75*3;//abc
-            int take = 75*10;//d,e,f,g,h,i,j,k,l,m
+            int skip = 75*7;//abcdefg
+            int take = 75*5;//h,i,j,k,l
             var urls_part = urls.Skip(skip).Take(take).ToList();
 
             //var urlsProcessed = await scheduler.ScheduleSingleThread(urls_part);

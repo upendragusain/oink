@@ -44,7 +44,6 @@ namespace WebCrawler
                             if (pageBooks != null && pageBooks.Any())
                             {
                                 //download images for the book url
-                                Log.Information("Processing page books images ...");
                                 foreach (var book in pageBooks)
                                 {
                                     var firstImage = book.Images.FirstOrDefault();
@@ -59,8 +58,9 @@ namespace WebCrawler
                                 await _context.InsertManyAsync(pageBooks);
                                 Log.Information("Saved books to db");
                                 counter++;
-                                semaphore.Release();
                             }
+
+                            semaphore.Release();
                         }));
                     }
                     catch (Exception ex)

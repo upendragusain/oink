@@ -1,3 +1,4 @@
+using Catalog.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ namespace Catalog.API
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
 
             services.Configure<CatalogSettings>(Configuration);
+            services.AddScoped<BookReadDataContext, BookReadDataContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
