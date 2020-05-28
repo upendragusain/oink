@@ -19,9 +19,10 @@ namespace WebCrawler
             _context = context;
         }
 
-        public async Task ScheduleWithSemaphore(List<string> urls)
+        public async Task<int> ScheduleWithSemaphore(List<string> urls)
         {
-            using (var semaphore = new SemaphoreSlim(4, 4))
+            int counter = 0;
+            using (var semaphore = new SemaphoreSlim(3, 3))
             {
                 List<Task> trackedTasks = new List<Task>();
 
@@ -57,20 +58,25 @@ namespace WebCrawler
                                 //finally save to db
                                 await _context.InsertManyAsync(pageBooks);
                                 Log.Information("Saved books to db");
+                                counter++;
+                                semaphore.Release();
                             }
                         }));
                     }
                     catch (Exception ex)
                     {
                         Log.Error("{0}", ex);
-                    }
-                    finally
-                    {
                         semaphore.Release();
+                        return counter;// stop on first error
                     }
+                    //finally
+                    //{
+                    //    semaphore.Release();
+                    //}
                 }
 
                 await Task.WhenAll(trackedTasks);
+                return counter;
             }
         }
 
@@ -118,8 +124,9 @@ namespace WebCrawler
         //    }
         //}
 
-        public async Task ScheduleSingleThread(List<string> urls)
+        public async Task<int> ScheduleSingleThread(List<string> urls)
         {
+            int counter = 0;
             foreach (var url in urls)
             {
                 try
@@ -148,14 +155,17 @@ namespace WebCrawler
                         //finally save to db
                         await _context.InsertManyAsync(pageBooks);
                         Log.Information("Saved books to db");
+                        counter++;
                     }
                 }
                 catch (System.Exception ex)
                 {
                     Log.Error("{0}", ex);
-                    return;// stop on first error
+                    return counter;// stop on first error
                 }
             }
+
+            return counter;
         }
     }
 }
