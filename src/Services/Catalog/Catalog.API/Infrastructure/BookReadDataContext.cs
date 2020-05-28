@@ -29,6 +29,14 @@ namespace Catalog.API.Infrastructure
             }
         }
 
+        public async Task<Book> GetSingleOrDefaultAsync(string documentId)
+        {
+            var filter = Builders<Book>.Filter
+                .Eq("Id", ObjectId.Parse(documentId));
+
+            return await CatalogData.Find(filter).FirstAsync();
+        }
+
         private async Task<List<Book>> GetAllDocumentsAsync()
         {
             return await CatalogData.Find(new BsonDocument())

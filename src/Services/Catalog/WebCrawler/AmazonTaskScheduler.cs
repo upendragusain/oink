@@ -22,7 +22,7 @@ namespace WebCrawler
         public async Task<int> ScheduleWithSemaphore(List<string> urls)
         {
             int counter = 0;
-            using (var semaphore = new SemaphoreSlim(3, 3))
+            using (var semaphore = new SemaphoreSlim(2, 2))
             {
                 List<Task> trackedTasks = new List<Task>();
 

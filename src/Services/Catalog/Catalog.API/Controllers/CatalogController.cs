@@ -28,7 +28,7 @@ namespace Catalog.API.Controllers
 
             var itemsOnPage = await _context.GetDocumentsForAPage(pageSize, pageIndex);
 
-            var books = itemsOnPage.Select(_ => MapToBook(_));
+            var books = itemsOnPage.Select(_ => MapToBookViewModel(_));
 
             var model = new PaginatedItemsViewModel<BookViewModel>(
                 pageIndex, pageSize, totalItems, books);
@@ -36,7 +36,22 @@ namespace Catalog.API.Controllers
             return Ok(model);
         }
 
-        private BookViewModel MapToBook(CatalogItem catalogItem)
+        [HttpGet]
+        [Route("items/{id}")]
+        public async Task<ActionResult<BookViewModel>> ItemByIdAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            var item = await _context.GetSingleOrDefaultAsync(id);
+
+            return item != null ? MapToBookViewModel(item) 
+                : (ActionResult<BookViewModel>) NotFound();
+        }
+
+        private BookViewModel MapToBookViewModel(CatalogItem catalogItem)
         {
             var book = (Book)catalogItem;
             return new BookViewModel()
