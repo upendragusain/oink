@@ -1,7 +1,5 @@
 ﻿using Catalog.API.Model;
-using MongoDB.Bson;
 using Serilog;
-using Serilog.Enrichers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

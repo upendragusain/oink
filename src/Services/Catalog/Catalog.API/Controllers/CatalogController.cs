@@ -65,17 +65,5 @@ namespace Catalog.API.Controllers
                 ImageContent = book.Images?.FirstOrDefault()?.Content
             };
         }
-
-        //[HttpGet("{id}")]
-        //[Route("Stream")]
-        //public async Task<IActionResult> DownloadImage()
-        //{
-        //    Stream stream = _context.MarketingData.
-        //    string mimeType = "image/jpeg";
-        //    return new FileStreamResult(stream, mimeType)
-        //    {
-        //        FileDownloadName = "image.jpeg"
-        //    };
-        //}
     }
 }
