@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Drawing;
+using System.IO;
+using System.Threading.Tasks;
+using Catalog.API.Infrastructure;
 using Catalog.API.Model;
 using Catalog.API.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Catalog.API.Controllers
 {
@@ -9,15 +13,22 @@ namespace Catalog.API.Controllers
     [ApiController]
     public class CatalogController : ControllerBase
     {
-        //[HttpGet]
-        //public async Task<ActionResult> ItemsAsync([FromQuery]int pageSize = 10, [FromQuery]int pageIndex = 0, string ids = null)
+        private readonly CatalogReadDataContext _context;
+        public CatalogController(CatalogReadDataContext context)
+        {
+            _context = context;
+        }
+
+        //[HttpGet("{id}")]
+        //[Route("Stream")]
+        //public async Task<IActionResult> DownloadImage()
         //{
-        //    int totalItems = 100;
-        //    int itemsOnPage = 10;
-
-        //    var model = new PaginatedItemsViewModel<CatalogItem>(pageIndex, pageSize, totalItems, itemsOnPage);
-
-        //    return Ok(model);
+        //    Stream stream = _context.MarketingData.
+        //    string mimeType = "image/jpeg";
+        //    return new FileStreamResult(stream, mimeType)
+        //    {
+        //        FileDownloadName = "image.jpeg"
+        //    };
         //}
     }
 }

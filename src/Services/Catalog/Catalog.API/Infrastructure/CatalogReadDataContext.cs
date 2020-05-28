@@ -22,8 +22,10 @@ namespace Catalog.API.Infrastructure
         {
             get
             {
-                return _database.GetCollection<CatalogItem>("CatalogReadDataContext");
+                return _database.GetCollection<CatalogItem>("Books");
             }
         }
+
+
     }
 }

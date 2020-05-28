@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Serilog;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +23,7 @@ namespace WebCrawler
         public async Task ScheduleWithSemaphore(List<string> urls)
         {
             // Create the semaphore.
-            semaphore = new SemaphoreSlim(5, 5);
+            semaphore = new SemaphoreSlim(4, 4);
             List<Task> trackedTasks = new List<Task>();
 
             foreach (var url in urls)
@@ -31,19 +33,42 @@ namespace WebCrawler
                 trackedTasks.Add(Task.Run(async () =>
                 {
                     // Each task begins by requesting the semaphore.
-                    //Debug.WriteLine($"{Task.CurrentId}, url {url}");
                     try
                     {
+                        //get the page books
                         Crawler crawler = new Crawler();
+
+                        Log.Information("Before Processing page {0}", url);
                         var pageBooks = await crawler.ProcessAsync(url);
+                        Log.Information("After Processing page {0}", url);
+
                         if (pageBooks != null && pageBooks.Any())
+                        {
+                            //download images for the book url
+                            foreach (var book in pageBooks)
+                            {
+                                Log.Information("Before Processing book image url {0}", book.Id);
+                                var firstImage = book.Images.FirstOrDefault();
+                                if (firstImage != null)
+                                {
+                                    FileDownload fileDownload = new FileDownload();
+                                    firstImage.Content = await fileDownload.Download(firstImage.Url);
+                                    Log.Information("After Processing book image url {0}", firstImage.Url);
+                                }
+                            }
+
+                            //finally save to db
+                            Log.Information("Before saving to db {0}", url);
                             await _context.InsertManyAsync(pageBooks);
+                            Log.Information("After saving to db {0}", url);
+                        }
                     }
                     catch (System.Exception)
                     {
                     }
                     finally
                     {
+                        Log.Information("calling semaphore.Release();");
                         semaphore.Release();
                     }
                 }));
@@ -96,21 +121,43 @@ namespace WebCrawler
         //    }
         //}
 
-        //// for testing purposes
-        //public void Schedule(List<List<string>> urls)
-        //{
-        //    foreach (var urlsToProcessInThisThread in urls)
-        //    {
-        //        foreach (var url in urlsToProcessInThisThread)
-        //        {
-        //            Console.WriteLine($"SINGLE Processing {url} on thread {Thread.CurrentThread.ManagedThreadId}");
-        //            Crawler crawler = new Crawler();
-        //            var pageBooks = crawler.ProcessAsync(url);
+        // for testing purposes
+        public async Task Schedule(List<string> urls)
+        {
+            foreach (var url in urls)
+            {
+                try
+                {
+                    //get the page books
+                    Crawler crawler = new Crawler();
+                    Console.WriteLine($"Processing {url}");
+                    Log.Information("Processing page {0}", url);
+                    var pageBooks = await crawler.ProcessAsync(url);
 
-        //            if (pageBooks != null && pageBooks.Result.Any())
-        //                _context.InsertMany(pageBooks.Result);
-        //        }
-        //    }
-        //}
+                    if (pageBooks != null && pageBooks.Any())
+                    {
+                        //download images for the book url
+                        Log.Information("Processing page books images ...");
+                        foreach (var book in pageBooks)
+                        {
+                            var firstImage = book.Images.FirstOrDefault();
+                            if (firstImage != null)
+                            {
+                                FileDownload fileDownload = new FileDownload();
+                                firstImage.Content = await fileDownload.Download(firstImage.Url);
+                            }
+                        }
+
+                        //finally save to db
+                        await _context.InsertManyAsync(pageBooks);
+                        Log.Information("Saved books to db");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Error("{0}", ex);
+                }
+            }
+        }
     }
 }

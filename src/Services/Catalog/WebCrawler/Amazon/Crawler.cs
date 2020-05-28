@@ -1,21 +1,22 @@
-﻿using HtmlAgilityPack;
+﻿using Catalog.API.Model;
+using HtmlAgilityPack;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
-using WebCrawler.Model;
 
 namespace WebCrawler.Amazon
 {
-    public class Crawler : ICrawler<AmazonBook>
+    public class Crawler : ICrawler<CatalogItem>
     {
         private const string XPATH = @"//div[@data-asin]";//data-asin="0702300179"
 
-        public async Task<IEnumerable<AmazonBook>> ProcessAsync(string pageUrl)
+        public async Task<IEnumerable<CatalogItem>> ProcessAsync(string pageUrl)
         {
-            var pageBooks = new List<AmazonBook>();
+            var pageBooks = new List<CatalogItem>();
 
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(pageUrl);
@@ -49,17 +50,30 @@ namespace WebCrawler.Amazon
 
                     if (node_author != null)
                     {
-                        pageBooks.Add(new AmazonBook()
+                        var bookName = HttpUtility.HtmlDecode(node_alt.Trim());
+                        Log.Information("Found book - {0}", bookName);
+                        CatalogItem book = new Book()
                         {
-                            Title = HttpUtility.HtmlDecode(node_alt.Trim()),
-                            Uri = node_src.Trim(),
-                            Author = HttpUtility.HtmlDecode(node_author.InnerText.Trim())
-                        });
+                            Name = bookName,
+                            Price = GetBookPriceRandom(),
+                            Department = new DepartmentType() { Name = "Books" },
+                            Images = new List<CatalogImage>()
+                            {
+                                new CatalogImage(){ Url = node_src.Trim() }
+                            },
+                            AuthorName = HttpUtility.HtmlDecode(node_author.InnerText.Trim()),
+                        };
+                        pageBooks.Add(book);
                     }
                 }
             }
 
             return pageBooks;
+        }
+
+        private decimal GetBookPriceRandom()
+        {
+            return Math.Round((decimal)(new Random().NextDouble() * new Random().Next(10, 100)), 2);
         }
     }
 }

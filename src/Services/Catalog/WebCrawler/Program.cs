@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Catalog.API.Model;
+using MongoDB.Bson;
+using Serilog;
+using Serilog.Enrichers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using WebCrawler.Infrastructure;
-using WebCrawler.Model;
 
 namespace WebCrawler
 {
@@ -12,13 +14,22 @@ namespace WebCrawler
     {
         public static async Task Main(string[] args)
         {
+            var logger = Log.Logger = new LoggerConfiguration()
+                 //.MinimumLevel.Debug()
+                 .WriteTo.Async(w => w.File("logs.json", 
+                 rollingInterval: RollingInterval.Hour, 
+                 outputTemplate: 
+                 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} <{ThreadId}><{ThreadName}>{NewLine}{Exception}"))
+                 .Enrich.WithThreadId()
+                 .CreateLogger();
+
             string connectionString = "mongodb://localhost:27017";
             string database = "CatalogDb";
             CatalogDataContext catalogDataContext = new CatalogDataContext(
                 connectionString, database);
 
             var scheduler =
-                new AmazonTaskScheduler<AmazonBook>(catalogDataContext);
+                new AmazonTaskScheduler<Book>(catalogDataContext);
 
             var urls = SetUpURLs();
 
@@ -28,9 +39,11 @@ namespace WebCrawler
             //Console.WriteLine($"Processing with multiple threads");
             //scheduler.ScheduleWithThreads(urls);
 
-            //urls = urls.Take(10).ToList();
-            await scheduler.ScheduleWithSemaphore(urls);
+            var urls_part = urls.Take(10).ToList();
+            //await scheduler.ScheduleWithSemaphore(urls);
+            await scheduler.Schedule(urls_part);
 
+            Console.WriteLine($"Processed {urls_part.Count} books.");
             Console.Read();
         }
 

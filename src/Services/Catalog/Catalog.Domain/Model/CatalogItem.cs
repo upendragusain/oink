@@ -1,5 +1,5 @@
-﻿//using MongoDB.Bson;
-//using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 
@@ -7,11 +7,10 @@ namespace Catalog.API.Model
 {
     public class CatalogItem
     {
-        //designate this property as the document's primary key.
-        //[BsonId]
-        ////to allow passing the parameter as type string instead of an ObjectId structure. Mongo handles the conversion from string to ObjectId.
-        //[BsonRepresentation(BsonType.ObjectId)]
-        public int Id { get; set; }
+        [BsonId]
+        [BsonIgnoreIfDefault]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -23,7 +22,7 @@ namespace Catalog.API.Model
 
         public List<CategoryType> Categories { get; set; }
 
-        public List<Uri> Pictures { get; set; }
+        public List<CatalogImage> Images { get; set; }
 
         public List<CustomerReview> Reviews { get; set; }
     }
