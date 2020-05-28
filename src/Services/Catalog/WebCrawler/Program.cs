@@ -32,11 +32,12 @@ namespace WebCrawler
                 new AmazonTaskScheduler<Book>(catalogDataContext);
 
             var urls = SetUpURLs();
+            int skip = 0;
+            int take = 100;
+            var urls_part = urls.Skip(skip).Take(take).ToList();
 
-            var urls_part = urls.Take(100).ToList();
-            //await scheduler.Schedule(urls_part);
-
-            await scheduler.ScheduleWithSemaphore(urls_part);
+            await scheduler.ScheduleSingleThread(urls_part);
+            //await scheduler.ScheduleWithSemaphore(urls_part);
 
             Console.WriteLine($"Processed {urls_part.Count} books.");
             Console.Read();

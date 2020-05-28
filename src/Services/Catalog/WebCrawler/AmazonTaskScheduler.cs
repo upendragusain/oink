@@ -58,8 +58,6 @@ namespace WebCrawler
                                 await _context.InsertManyAsync(pageBooks);
                                 Log.Information("Saved books to db");
                             }
-
-                            //semaphore.Release();
                         }));
                     }
                     catch (Exception ex)
@@ -120,8 +118,7 @@ namespace WebCrawler
         //    }
         //}
 
-        // for testing purposes
-        public async Task Schedule(List<string> urls)
+        public async Task ScheduleSingleThread(List<string> urls)
         {
             foreach (var url in urls)
             {
@@ -129,14 +126,15 @@ namespace WebCrawler
                 {
                     //get the page books
                     Crawler crawler = new Crawler();
+
                     Console.WriteLine($"Processing {url}");
                     Log.Information("Processing page {0}", url);
+
                     var pageBooks = await crawler.ProcessAsync(url);
 
                     if (pageBooks != null && pageBooks.Any())
                     {
                         //download images for the book url
-                        Log.Information("Processing page books images ...");
                         foreach (var book in pageBooks)
                         {
                             var firstImage = book.Images.FirstOrDefault();
@@ -155,6 +153,7 @@ namespace WebCrawler
                 catch (System.Exception ex)
                 {
                     Log.Error("{0}", ex);
+                    return;// stop on first error
                 }
             }
         }
