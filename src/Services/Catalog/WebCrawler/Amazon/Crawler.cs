@@ -24,8 +24,6 @@ namespace WebCrawler.Amazon
                 return pageBooks;
 
             var content = await response.Content.ReadAsStreamAsync();
-            //if (content.Length < 100)
-            //    return pageBooks;
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.Load(content);

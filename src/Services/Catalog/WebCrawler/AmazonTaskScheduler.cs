@@ -12,7 +12,6 @@ namespace WebCrawler
     public class AmazonTaskScheduler<T>
     {
         private readonly CatalogDataContext _context;
-        private static SemaphoreSlim semaphore;
 
         public AmazonTaskScheduler(
             CatalogDataContext context)
@@ -22,59 +21,59 @@ namespace WebCrawler
 
         public async Task ScheduleWithSemaphore(List<string> urls)
         {
-            // Create the semaphore.
-            semaphore = new SemaphoreSlim(4, 4);
-            List<Task> trackedTasks = new List<Task>();
-
-            foreach (var url in urls)
+            using (var semaphore = new SemaphoreSlim(4, 4))
             {
-                await semaphore.WaitAsync();
+                List<Task> trackedTasks = new List<Task>();
 
-                trackedTasks.Add(Task.Run(async () =>
+                foreach (var url in urls)
                 {
-                    // Each task begins by requesting the semaphore.
                     try
                     {
-                        //get the page books
-                        Crawler crawler = new Crawler();
+                        await semaphore.WaitAsync().ConfigureAwait(false);
 
-                        Log.Information("Before Processing page {0}", url);
-                        var pageBooks = await crawler.ProcessAsync(url);
-                        Log.Information("After Processing page {0}", url);
-
-                        if (pageBooks != null && pageBooks.Any())
+                        trackedTasks.Add(Task.Run(async () =>
                         {
-                            //download images for the book url
-                            foreach (var book in pageBooks)
+                            //get the page books
+                            Crawler crawler = new Crawler();
+
+                            Console.WriteLine($"Processing {url}");
+                            Log.Information("Processing page {0}", url);
+                            var pageBooks = await crawler.ProcessAsync(url);
+
+                            if (pageBooks != null && pageBooks.Any())
                             {
-                                Log.Information("Before Processing book image url {0}", book.Id);
-                                var firstImage = book.Images.FirstOrDefault();
-                                if (firstImage != null)
+                                //download images for the book url
+                                Log.Information("Processing page books images ...");
+                                foreach (var book in pageBooks)
                                 {
-                                    FileDownload fileDownload = new FileDownload();
-                                    firstImage.Content = await fileDownload.Download(firstImage.Url);
-                                    Log.Information("After Processing book image url {0}", firstImage.Url);
+                                    var firstImage = book.Images.FirstOrDefault();
+                                    if (firstImage != null)
+                                    {
+                                        FileDownload fileDownload = new FileDownload();
+                                        firstImage.Content = await fileDownload.Download(firstImage.Url);
+                                    }
                                 }
+
+                                //finally save to db
+                                await _context.InsertManyAsync(pageBooks);
+                                Log.Information("Saved books to db");
                             }
 
-                            //finally save to db
-                            Log.Information("Before saving to db {0}", url);
-                            await _context.InsertManyAsync(pageBooks);
-                            Log.Information("After saving to db {0}", url);
-                        }
+                            //semaphore.Release();
+                        }));
                     }
-                    catch (System.Exception)
+                    catch (Exception ex)
                     {
+                        Log.Error("{0}", ex);
                     }
                     finally
                     {
-                        Log.Information("calling semaphore.Release();");
                         semaphore.Release();
                     }
-                }));
-            }
+                }
 
-            await Task.WhenAll(trackedTasks);
+                await Task.WhenAll(trackedTasks);
+            }
         }
 
         //public void ScheduleWithThreads(

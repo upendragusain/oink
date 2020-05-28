@@ -19,7 +19,7 @@ namespace WebCrawler
                  .WriteTo.Async(w => w.File("logs.json", 
                  rollingInterval: RollingInterval.Hour, 
                  outputTemplate: 
-                 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} <{ThreadId}><{ThreadName}>{NewLine}{Exception}"))
+                 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} #{ThreadId} {NewLine}{Exception}"))
                  .Enrich.WithThreadId()
                  .CreateLogger();
 
@@ -33,15 +33,10 @@ namespace WebCrawler
 
             var urls = SetUpURLs();
 
-            //Console.WriteLine($"Processing with a single thread");
-            //scheduler.Schedule(urls);
+            var urls_part = urls.Take(100).ToList();
+            //await scheduler.Schedule(urls_part);
 
-            //Console.WriteLine($"Processing with multiple threads");
-            //scheduler.ScheduleWithThreads(urls);
-
-            var urls_part = urls.Take(10).ToList();
-            //await scheduler.ScheduleWithSemaphore(urls);
-            await scheduler.Schedule(urls_part);
+            await scheduler.ScheduleWithSemaphore(urls_part);
 
             Console.WriteLine($"Processed {urls_part.Count} books.");
             Console.Read();
