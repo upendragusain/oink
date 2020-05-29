@@ -1,0 +1,28 @@
+﻿@model IndexViewModel
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+    <div class="container-fluid">
+
+        @if (Model.Books.Count() > 0)
+        {
+            <partial name="_pagination" for="PaginationInfo" />
+
+            <div class="row">
+                @foreach (var book in Model.Books)
+                {
+                    <partial name="_book" model="book" />
+                }
+            </div>
+
+            <partial name="_pagination" for="PaginationInfo" />
+        }
+        else
+        {
+            <div class="row">
+                THERE ARE NO RESULTS THAT MATCH YOUR SEARCH
+            </div>
+        }
+    </div>

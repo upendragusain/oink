@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebMVC.Models;
@@ -19,8 +20,21 @@ namespace WebMVC.Services
             _logger = logger;
         }
 
-        public async Task<BookViewModel> GetItem(
-            string id)
+        public async Task<BookViewModel> GetItems(
+            int pageSize, int pageIndex)
+        {
+            var uri = "https://localhost:44392/api/catalog/items?pageSize=" 
+                + pageSize + "&pageIndex=" + pageIndex;
+
+            var responseString = await _httpClient.GetStringAsync(uri);
+
+            var pageBooks = JsonConvert.DeserializeObject<BookViewModel>(responseString);
+
+            return pageBooks;
+        }
+
+
+        public async Task<BookDetailViewModel> GetItem(string id)
         {
             var uri = "https://localhost:44392/api/catalog/items/" + id;
 
@@ -28,7 +42,7 @@ namespace WebMVC.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var book = JsonConvert.DeserializeObject<BookViewModel>(
+                var book = JsonConvert.DeserializeObject<BookDetailViewModel>(
                     await response.Content.ReadAsStringAsync());
 
                 return book;

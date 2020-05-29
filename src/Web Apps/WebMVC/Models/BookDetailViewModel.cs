@@ -1,6 +1,6 @@
-﻿namespace Catalog.API.ViewModel
+﻿namespace WebMVC.Models
 {
-    public class BookViewModel
+    public class BookDetailViewModel
     {
         public string Id { get; set; }
 
@@ -16,7 +16,7 @@
 
         public string ImageUrl { get; set; }
 
-        public byte[] ImageContent { get; set; }
+        //public byte[] ImageContent { get; set; }
 
     }
 }

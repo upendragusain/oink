@@ -1,20 +1,12 @@
-﻿namespace WebMVC.Models
+﻿using System.Collections.Generic;
+
+namespace WebMVC.Models
 {
     public class BookViewModel
     {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public decimal Price { get; set; }
-
-        public string AuthorName { get; set; }
-
-        public string Publisher { get; set; }
-
-        public byte[] ImageContent { get; set; }
-
+        public int PageIndex { get; set; }
+        public int PageSize { get; set; }
+        public int Count { get; set; }
+        public List<BookDetailViewModel> Data { get; set; }
     }
 }

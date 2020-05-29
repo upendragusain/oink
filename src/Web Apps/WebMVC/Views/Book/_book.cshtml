@@ -1,0 +1,23 @@
+﻿@model BookDetailViewModel
+
+
+@*<div class="col-sm-6">*@
+
+    <div class="col-sm-3">
+        <img src="@Model.ImageUrl" />
+    </div>
+    <div class="col-sm-9">
+        <div class="col-sm-9">
+            @Html.DisplayFor(model => model.Name, new { @class = "font: bold;" })
+        </div>
+        <div class="col-sm-9">
+            <span>by</span> @Html.DisplayFor(model => model.AuthorName)
+        </div>
+        <div class="col-sm-9">
+            <span>£</span> @Html.DisplayFor(model => model.Price)
+        </div>
+    </div>
+
+@*</div>*@
+
+

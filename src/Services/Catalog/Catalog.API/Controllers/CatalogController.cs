@@ -62,6 +62,7 @@ namespace Catalog.API.Controllers
                 Price = book.Price,
                 Description = book.Description,
                 Publisher = book.Publisher,
+                ImageUrl = book.Images?.FirstOrDefault()?.Url,
                 ImageContent = book.Images?.FirstOrDefault()?.Content
             };
         }
