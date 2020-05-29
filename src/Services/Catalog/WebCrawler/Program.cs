@@ -30,14 +30,14 @@ namespace WebCrawler
                 new AmazonTaskScheduler<Book>(catalogDataContext);
 
             var urls = SetUpURLs();
-            int skip = 75*19;//abcdefghijklmnopqrs
-            int take = 75*3;
+            int skip = 75*25;//abcdefghijklmnopqrstuvwxy
+            int take = 75*1;
             var urls_part = urls.Skip(skip).Take(take).ToList();
 
             //var urlsProcessed = await scheduler.ScheduleSingleThread(urls_part);
-            var urlsProcessed = await scheduler.ScheduleWithSemaphore(urls_part);
+            //var urlsProcessed = await scheduler.ScheduleWithSemaphore(urls_part);
 
-            Console.WriteLine($"Processed {urlsProcessed}/{urls_part.Count} urls.");
+            //Console.WriteLine($"Processed {urlsProcessed}/{urls_part.Count} urls.");
             Console.Read();
         }
 

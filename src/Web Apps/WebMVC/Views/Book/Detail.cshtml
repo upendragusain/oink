@@ -4,56 +4,26 @@
     ViewData["Title"] = "Detail";
 }
 
-<h1>Detail</h1>
 
-<div>
-    <h4>BookViewModel</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AuthorName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AuthorName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Publisher)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Publisher)
-        </dd>
-        @*<dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageContent)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageContent)
-        </dd>*@
-    </dl>
+<div class="row">
+    <div class="col-sm-3">
+        <img style="max-width: 248px; max-height: 346px; position: absolute; top: 0px; left: 0px; width: 248px; height: 346px;"
+             src="@String.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(Model.ImageContent))" />
+    </div>
+    <div class="col-sm-9">
+        <div class="col-sm-9">
+            @Html.DisplayFor(model => model.Name, new { @class = "font: bold;" })
+        </div>
+        <div class="col-sm-9">
+            <span>by</span> @Html.DisplayFor(model => model.AuthorName)
+        </div>
+        <div class="col-sm-9">
+            <span>£</span> @Html.DisplayFor(model => model.Price)
+        </div>
+    </div>
+
 </div>
+
 <div>
     @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
     <a asp-action="Index">Back to List</a>
