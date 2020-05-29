@@ -1,24 +1,69 @@
 ﻿@model PaginationInfo
 
-<div class="esh-pager">
-    <div class="container">
-        <article class="esh-pager-wrapper row">
-            <nav>
-                <a class="esh-pager-item esh-pager-item--navigable @Model.Previous"
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        @if (Model.TotalPages >= 2 && Model.ActualPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link @Model.Previous"
                    id="Previous"
                    asp-controller="Book"
                    asp-action="Index"
-                   asp-route-page="@(Model.ActualPage -1)"
+                   asp-route-page="@(Model.ActualPage - 1)"
                    asp-route-searchTerm="@(Model.SearchTerm)"
                    aria-label="Previous">
                     Previous
                 </a>
+            </li>
+        }
 
-                <span class="esh-pager-item">
-                    Showing @Model.ItemsPerPage of @Model.TotalItems products - Page @(Model.ActualPage + 1) - @Model.TotalPages
-                </span>
+        @if (Model.TotalPages > 1)
+        {
+            <li class="page-item">
+                <a class="page-link @Model.Next"
+                   id="Next"
+                   asp-controller="Book"
+                   asp-action="Index"
+                   asp-route-page="@(Model.ActualPage + 1)"
+                   asp-route-searchTerm="@(Model.SearchTerm)"
+                   aria-label="Next">
+                    @(Model.ActualPage + 1)
+                </a>
+            </li>
+        }
+        @if (Model.TotalPages > 2)
+        {
+            <li class="page-item">
+                <a class="page-link @Model.Next"
+                   id="Next"
+                   asp-controller="Book"
+                   asp-action="Index"
+                   asp-route-page="@(Model.ActualPage + 2)"
+                   asp-route-searchTerm="@(Model.SearchTerm)"
+                   aria-label="Next">
+                    @(Model.ActualPage + 2)
+                </a>
+            </li>
+        }
+        @if (Model.TotalPages > 3)
+        {
+            <li class="page-item">
+                <a class="page-link @Model.Next"
+                   id="Next"
+                   asp-controller="Book"
+                   asp-action="Index"
+                   asp-route-page="@(Model.ActualPage + 3)"
+                   asp-route-searchTerm="@(Model.SearchTerm)"
+                   aria-label="Next">
+                    @(Model.ActualPage + 3)
+                </a>
+            </li>
+        }
 
-                <a class="esh-pager-item esh-pager-item--navigable @Model.Next"
+        @if (Model.TotalPages > 1 && Model.ActualPage != Model.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link @Model.Next"
                    id="Next"
                    asp-controller="Book"
                    asp-action="Index"
@@ -27,8 +72,8 @@
                    aria-label="Next">
                     Next
                 </a>
-            </nav>
-        </article>
-    </div>
-</div>
+            </li>
+        }
+    </ul>
+</nav>
 

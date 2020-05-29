@@ -22,20 +22,25 @@ namespace WebMVC.Controllers
         public async Task<IActionResult> Index(
             int? page, string searchTerm = null)
         {
+
+            if (page <= 0)
+                page = 1;
+
             var itemsPage = 10;
 
             var pageBooks = await _bookService.GetItems(
-                itemsPage, page ?? 0, searchTerm);
+                itemsPage, page ?? 1, searchTerm);
 
             var vm = new IndexViewModel()
+
             {
                 Books = pageBooks.Data,
                 PaginationInfo = new PaginationInfo()
                 {
-                    ActualPage = page ?? 0,
+                    ActualPage = page ?? 1,
                     ItemsPerPage = pageBooks.Data.Count,
                     TotalItems = pageBooks.Count,
-                    TotalPages = (int)Math.Ceiling(((decimal)pageBooks.Count / itemsPage)),
+                    TotalPages = (int)Math.Ceiling((decimal)pageBooks.Count / itemsPage),
                     SearchTerm = searchTerm
                 }
             };

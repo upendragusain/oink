@@ -64,7 +64,7 @@ namespace Catalog.API.Infrastructure
                 : new BsonDocument();
 
             return await CatalogData.Find(filter)
-                    .Skip(pageSize * pageIndex)
+                    .Skip(pageSize * (pageIndex-1))
                     .Limit(pageSize)
                     .ToListAsync();
         }

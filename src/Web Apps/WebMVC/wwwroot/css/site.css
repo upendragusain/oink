@@ -109,3 +109,13 @@ body {
         margin: 0 2.5vw;
     }
 }
+
+
+/*search bar*/
+
+#navbar[data-template=layoutSwapToolBar].layout2 #nav-search {
+    padding-top: 10px;
+    padding-left: 3px;
+    height: 60px;
+}
+

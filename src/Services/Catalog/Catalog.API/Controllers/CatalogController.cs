@@ -22,12 +22,16 @@ namespace Catalog.API.Controllers
         [Route("items")]
         public async Task<IActionResult> ItemsAsync(
             [FromQuery]int pageSize = 10, 
-            [FromQuery]int pageIndex = 0,
+            [FromQuery]int pageIndex = 1,
             [FromQuery]string searchTerm = null)
         {
+            if (pageIndex <= 0)
+                pageIndex = 1;
+
             var totalItems = await _context.GetAllDocumentsCountAsync(searchTerm);
 
-            var itemsOnPage = await _context.GetDocumentsForAPage(pageSize, pageIndex, searchTerm);
+            var itemsOnPage = await _context.GetDocumentsForAPage(
+                pageSize, pageIndex, searchTerm);
 
             var books = itemsOnPage.Select(_ => MapToBookViewModel(_));
 
