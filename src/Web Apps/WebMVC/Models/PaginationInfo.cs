@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace WebMVC.Models
+﻿namespace WebMVC.Models
 {
     public class PaginationInfo
     {
@@ -13,5 +8,6 @@ namespace WebMVC.Models
         public int TotalPages { get; set; }
         public string Previous { get; set; }
         public string Next { get; set; }
+        public string SearchTerm { get; set; }
     }
 }

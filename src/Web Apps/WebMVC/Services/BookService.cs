@@ -21,10 +21,10 @@ namespace WebMVC.Services
         }
 
         public async Task<BookViewModel> GetItems(
-            int pageSize, int pageIndex)
+            int pageSize, int pageIndex, string searchTerm = null)
         {
             var uri = "https://localhost:44392/api/catalog/items?pageSize=" 
-                + pageSize + "&pageIndex=" + pageIndex;
+                + pageSize + "&pageIndex=" + pageIndex + "&searchterm=" + searchTerm;
 
             var responseString = await _httpClient.GetStringAsync(uri);
 

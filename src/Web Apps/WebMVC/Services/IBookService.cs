@@ -7,7 +7,7 @@ namespace WebMVC.Services
     public interface IBookService
     {
         Task<BookViewModel> GetItems(
-            int pageSize, int pageIndex);
+            int pageSize, int pageIndex, string searchTerm = null);
 
         Task<BookDetailViewModel> GetItem(string id);
     }

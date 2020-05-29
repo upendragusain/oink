@@ -22,11 +22,12 @@ namespace Catalog.API.Controllers
         [Route("items")]
         public async Task<IActionResult> ItemsAsync(
             [FromQuery]int pageSize = 10, 
-            [FromQuery]int pageIndex = 0)
+            [FromQuery]int pageIndex = 0,
+            [FromQuery]string searchTerm = null)
         {
-            var totalItems = await _context.GetAllDocumentsCountAsync();
+            var totalItems = await _context.GetAllDocumentsCountAsync(searchTerm);
 
-            var itemsOnPage = await _context.GetDocumentsForAPage(pageSize, pageIndex);
+            var itemsOnPage = await _context.GetDocumentsForAPage(pageSize, pageIndex, searchTerm);
 
             var books = itemsOnPage.Select(_ => MapToBookViewModel(_));
 
@@ -63,7 +64,7 @@ namespace Catalog.API.Controllers
                 Description = book.Description,
                 Publisher = book.Publisher,
                 ImageUrl = book.Images?.FirstOrDefault()?.Url,
-                ImageContent = book.Images?.FirstOrDefault()?.Content
+                //ImageContent = book.Images?.FirstOrDefault()?.Content
             };
         }
     }

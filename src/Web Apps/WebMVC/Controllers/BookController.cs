@@ -20,12 +20,12 @@ namespace WebMVC.Controllers
         }
 
         public async Task<IActionResult> Index(
-            int? page)
+            int? page, string searchTerm = null)
         {
             var itemsPage = 10;
 
             var pageBooks = await _bookService.GetItems(
-                itemsPage, page ?? 0);
+                itemsPage, page ?? 0, searchTerm);
 
             var vm = new IndexViewModel()
             {
@@ -35,7 +35,8 @@ namespace WebMVC.Controllers
                     ActualPage = page ?? 0,
                     ItemsPerPage = pageBooks.Data.Count,
                     TotalItems = pageBooks.Count,
-                    TotalPages = (int)Math.Ceiling(((decimal)pageBooks.Count / itemsPage))
+                    TotalPages = (int)Math.Ceiling(((decimal)pageBooks.Count / itemsPage)),
+                    SearchTerm = searchTerm
                 }
             };
 

@@ -9,6 +9,7 @@
                    asp-controller="Book"
                    asp-action="Index"
                    asp-route-page="@(Model.ActualPage -1)"
+                   asp-route-searchTerm="@(Model.SearchTerm)"
                    aria-label="Previous">
                     Previous
                 </a>
@@ -22,6 +23,7 @@
                    asp-controller="Book"
                    asp-action="Index"
                    asp-route-page="@(Model.ActualPage + 1)"
+                   asp-route-searchTerm="@(Model.SearchTerm)"
                    aria-label="Next">
                     Next
                 </a>

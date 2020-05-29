@@ -43,21 +43,30 @@ namespace Catalog.API.Infrastructure
                 .ToListAsync();
         }
 
-        public async Task<long> GetAllDocumentsCountAsync()
+        public async Task<long> GetAllDocumentsCountAsync(string searchTerm = null)
         {
-            return await CatalogData.CountDocumentsAsync(new BsonDocument());
+            FilterDefinition<Book> filter = !string.IsNullOrWhiteSpace(searchTerm)
+                ? Builders<Book>.Filter
+                    .Where(p => p.Name.ToLower()
+                    .Contains(searchTerm.ToLower()))
+                : new BsonDocument();
+
+            return await CatalogData.CountDocumentsAsync(filter);
         }
 
         public async Task<List<Book>> GetDocumentsForAPage(
-            int pageSize, int pageIndex)
+            int pageSize, int pageIndex, string searchTerm = null)
         {
-            return await CatalogData.Find(new BsonDocument())
-                .Skip(pageSize * pageIndex)
-                .Limit(pageSize)
-                .ToListAsync();
+            FilterDefinition<Book> filter = !string.IsNullOrWhiteSpace(searchTerm)
+                ? Builders<Book>.Filter
+                    .Where(p => p.Name.ToLower()
+                    .Contains(searchTerm.ToLower()))
+                : new BsonDocument();
 
+            return await CatalogData.Find(filter)
+                    .Skip(pageSize * pageIndex)
+                    .Limit(pageSize)
+                    .ToListAsync();
         }
-
-
     }
 }
