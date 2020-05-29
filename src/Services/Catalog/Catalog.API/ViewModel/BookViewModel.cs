@@ -16,7 +16,7 @@
 
         public string ImageUrl { get; set; }
 
-        public byte[] ImageContent { get; set; }
+        //public byte[] ImageContent { get; set; }
 
     }
 }

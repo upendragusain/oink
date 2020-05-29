@@ -1,23 +1,20 @@
 ﻿@model BookDetailViewModel
 
 
-@*<div class="col-sm-6">*@
-
-    <div class="col-sm-3">
-        <img src="@Model.ImageUrl" />
+<div class="col-sm-3" style="padding-bottom:15px; padding-bottom:15px;">
+    <img src="@Model.ImageUrl" />
+</div>
+<div class="col-sm-9">
+    <div>
+        <span style="font-weight: 700;">@Model.Name</span>
     </div>
-    <div class="col-sm-9">
-        <div class="col-sm-9">
-            @Html.DisplayFor(model => model.Name, new { @class = "font: bold;" })
-        </div>
-        <div class="col-sm-9">
-            <span>by</span> @Html.DisplayFor(model => model.AuthorName)
-        </div>
-        <div class="col-sm-9">
-            <span>£</span> @Html.DisplayFor(model => model.Price)
-        </div>
+    <div>
+        <span>by</span> @Html.DisplayFor(model => model.AuthorName)
     </div>
+    <div>
+        <span>£</span>@Html.DisplayFor(model => model.Price)
+    </div>
+</div>
 
-@*</div>*@
-
+<hr style="width:100%;">
 

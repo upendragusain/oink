@@ -9,6 +9,7 @@
         @if (Model.Books.Count() > 0)
         {
             <partial name="_pagination" for="PaginationInfo" />
+            <hr style="width:100%;">
 
             <div class="row">
                 @foreach (var book in Model.Books)
@@ -17,6 +18,7 @@
                 }
             </div>
 
+            <hr style="width:100%;">
             <partial name="_pagination" for="PaginationInfo" />
         }
         else
