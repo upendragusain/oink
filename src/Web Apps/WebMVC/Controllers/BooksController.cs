@@ -7,12 +7,12 @@ using WebMVC.Services;
 
 namespace WebMVC.Controllers
 {
-    public class BookController : Controller
+    public class BooksController : Controller
     {
-        private readonly ILogger<BookController> _logger;
+        private readonly ILogger<BooksController> _logger;
         private IBookService _bookService;
 
-        public BookController(ILogger<BookController> logger,
+        public BooksController(ILogger<BooksController> logger,
             IBookService bookService)
         {
             _logger = logger;
