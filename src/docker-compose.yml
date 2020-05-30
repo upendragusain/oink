@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  seq:
+    image: datalust/seq:latest
+
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    build:
+      context: .
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+    depends_on:
+      - seq
