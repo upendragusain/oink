@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 
 namespace Catalog.API
 {
@@ -34,6 +35,7 @@ namespace Catalog.API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
@@ -51,8 +53,10 @@ namespace Catalog.API
         private static Serilog.ILogger CreateSerilogger(IConfiguration configuration)
         {
             return new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
                 .WriteTo.Seq(configuration["Serilog:SeqServerUrl"])
-                .WriteTo.File("logs.json")
+                //.WriteTo.File("logs.json")
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
         }
