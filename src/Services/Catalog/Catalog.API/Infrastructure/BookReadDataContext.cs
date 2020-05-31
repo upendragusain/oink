@@ -31,10 +31,13 @@ namespace Catalog.API.Infrastructure
 
         public async Task<Book> GetSingleOrDefaultAsync(string documentId)
         {
-            var filter = Builders<Book>.Filter
-                .Eq("Id", ObjectId.Parse(documentId));
+            ObjectId parsedObjectId;
+            ObjectId.TryParse(documentId, out parsedObjectId);
 
-            return await CatalogData.Find(filter).FirstAsync();
+            var filter = Builders<Book>.Filter
+                .Eq("Id", parsedObjectId);
+
+            return await CatalogData.Find(filter).FirstOrDefaultAsync();
         }
 
         private async Task<List<Book>> GetAllDocumentsAsync()
@@ -64,7 +67,7 @@ namespace Catalog.API.Infrastructure
                 : new BsonDocument();
 
             return await CatalogData.Find(filter)
-                    .Skip(pageSize * (pageIndex-1))
+                    .Skip(pageSize * (pageIndex - 1))
                     .Limit(pageSize)
                     .ToListAsync();
         }

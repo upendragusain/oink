@@ -3,6 +3,7 @@ using Catalog.API.Model;
 using Catalog.API.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Catalog.API.Controllers
@@ -17,14 +18,20 @@ namespace Catalog.API.Controllers
             _context = context;
         }
 
-        // GET api/v1/[controller]/items[?pageSize=3&pageIndex=10]
         [HttpGet]
         [Route("items")]
+        [ProducesResponseType(typeof(PaginatedItemsViewModel<BookViewModel>),(int)HttpStatusCode.OK)]
         public async Task<IActionResult> ItemsAsync(
             [FromQuery]int pageSize = 10, 
             [FromQuery]int pageIndex = 1,
             [FromQuery]string searchTerm = null)
         {
+            if (pageSize <= 0)
+                pageSize = 10;
+
+            if (pageSize > 50)
+                pageSize = 50;
+
             if (pageIndex <= 0)
                 pageIndex = 1;
 
@@ -43,6 +50,9 @@ namespace Catalog.API.Controllers
 
         [HttpGet]
         [Route("items/{id}")]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BookViewModel), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<BookViewModel>> ItemByIdAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
