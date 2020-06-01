@@ -1,9 +1,10 @@
-﻿namespace Catalog.API.Model
+﻿namespace Catalog.Domain.Model
 {
-    public class DepartmentType
+    public enum DepartmentType
     {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
+        None,
+        Book,
+        Movie,
+        Song
     }
 }

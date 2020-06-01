@@ -1,4 +1,4 @@
-﻿using Catalog.API.Model;
+﻿using Catalog.Domain.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -29,15 +29,37 @@ namespace WebCrawler
             var scheduler =
                 new AmazonTaskScheduler<Book>(catalogDataContext);
 
-            var urls = SetUpURLs();
-            int skip = 75*25;//abcdefghijklmnopqrstuvwxy
-            int take = 75*1;
-            var urls_part = urls.Skip(skip).Take(take).ToList();
+            var skipArgs = int.Parse(args[0]);
+            var takeArgs = int.Parse(args[1]);
+            Console.WriteLine($"Processing skip:{skipArgs}, taking:{takeArgs}");
+            Log.Information("{0}", skipArgs);
+            Log.Information("{0}", takeArgs);
 
-            //var urlsProcessed = await scheduler.ScheduleSingleThread(urls_part);
-            //var urlsProcessed = await scheduler.ScheduleWithSemaphore(urls_part);
 
-            //Console.WriteLine($"Processed {urlsProcessed}/{urls_part.Count} urls.");
+            try
+            {
+                if (skipArgs >= 0 && takeArgs > 0)
+                {
+                    var urls = SetUpURLs();
+                    int skip = skipArgs;//abcdefghijklmnopqrstuvwxy
+                    int take = takeArgs;
+                    var urls_part = urls.Skip(skip).Take(take).ToList();
+                    var urlsProcessed = await scheduler.ScheduleWithSemaphore(urls_part);
+                    //var urlsProcessed = await scheduler.ScheduleSingleThread(urls_part);
+
+                    Console.WriteLine($"Processed {urlsProcessed}/{urls_part.Count} urls.");
+                }
+                else
+                {
+                    Console.WriteLine("invalid input..."); 
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "{exception}");
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+            
             Console.Read();
         }
 

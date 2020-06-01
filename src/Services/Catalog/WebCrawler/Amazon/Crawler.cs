@@ -1,4 +1,4 @@
-﻿using Catalog.API.Model;
+﻿using WebCrawler.Model;
 using HtmlAgilityPack;
 using Serilog;
 using System;
@@ -7,16 +7,17 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
+using Catalog.Domain.Model;
 
 namespace WebCrawler.Amazon
 {
-    public class Crawler : ICrawler<CatalogItem>
+    public class Crawler : ICrawler<WebCrawler.Model.Book>
     {
         private const string XPATH = @"//div[@data-asin]";//data-asin="0702300179"
 
-        public async Task<IEnumerable<CatalogItem>> ProcessAsync(string pageUrl)
+        public async Task<IEnumerable<WebCrawler.Model.Book>> ProcessAsync(string pageUrl)
         {
-            var pageBooks = new List<CatalogItem>();
+            var pageBooks = new List<WebCrawler.Model.Book>();
 
             var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(pageUrl);
@@ -50,14 +51,18 @@ namespace WebCrawler.Amazon
                     {
                         var bookName = HttpUtility.HtmlDecode(node_alt.Trim());
                         Log.Information("Found book - {0}", bookName);
-                        CatalogItem book = new Book()
+                        WebCrawler.Model.Book book = new WebCrawler.Model.Book()
                         {
                             Name = bookName,
                             Price = GetBookPriceRandom(),
-                            Department = new DepartmentType() { Name = "Books" },
-                            Images = new List<CatalogImage>()
+                            Department = DepartmentType.Book,
+                            Media = new List<MediaContent>()
                             {
-                                new CatalogImage(){ Url = node_src.Trim() }
+                                new MediaContent()
+                                { 
+                                    Url = node_src.Trim(), 
+                                    ContentType = ContentType.Image 
+                                }
                             },
                             AuthorName = HttpUtility.HtmlDecode(node_author.InnerText.Trim()),
                         };

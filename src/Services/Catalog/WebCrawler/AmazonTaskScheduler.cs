@@ -44,15 +44,15 @@ namespace WebCrawler
                             if (pageBooks != null && pageBooks.Any())
                             {
                                 //download images for the book url
-                                foreach (var book in pageBooks)
-                                {
-                                    var firstImage = book.Images.FirstOrDefault();
-                                    if (firstImage != null)
-                                    {
-                                        FileDownload fileDownload = new FileDownload();
-                                        firstImage.Content = await fileDownload.Download(firstImage.Url);
-                                    }
-                                }
+                                //foreach (var book in pageBooks)
+                                //{
+                                //    var firstImage = book.Media.FirstOrDefault();
+                                //    if (firstImage != null)
+                                //    {
+                                //        FileDownload fileDownload = new FileDownload();
+                                //        firstImage.Content = await fileDownload.Download(firstImage.Url);
+                                //    }
+                                //}
 
                                 //finally save to db
                                 await _context.InsertManyAsync(pageBooks);
@@ -142,15 +142,15 @@ namespace WebCrawler
                     if (pageBooks != null && pageBooks.Any())
                     {
                         //download images for the book url
-                        foreach (var book in pageBooks)
-                        {
-                            var firstImage = book.Images.FirstOrDefault();
-                            if (firstImage != null)
-                            {
-                                FileDownload fileDownload = new FileDownload();
-                                firstImage.Content = await fileDownload.Download(firstImage.Url);
-                            }
-                        }
+                        //foreach (var book in pageBooks)
+                        //{
+                        //    //var firstImage = book.Images.FirstOrDefault();
+                        //    //if (firstImage != null)
+                        //    //{
+                        //    //    FileDownload fileDownload = new FileDownload();
+                        //    //    firstImage.Content = await fileDownload.Download(firstImage.Url);
+                        //    //}
+                        //}
 
                         //finally save to db
                         await _context.InsertManyAsync(pageBooks);

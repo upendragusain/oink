@@ -1,8 +1,6 @@
-﻿using System.Linq;
-
-namespace Catalog.Domain.Model
+﻿namespace Catalog.API.Dto
 {
-    public class Book : CatalogItem
+    public class Book : Product
     {
         public string AuthorName { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Catalog.API.Model
+namespace Catalog.Domain.Model
 {
     public class CustomerReview
     {
@@ -11,5 +11,7 @@ namespace Catalog.API.Model
         public string CustomerName { get; set; }
 
         public Uri CustomerPicture { get; set; }
+
+        public DateTime ReviewDate { get; set; }
     }
 }

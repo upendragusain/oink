@@ -1,4 +1,4 @@
-﻿namespace Catalog.API.Model
+﻿namespace Catalog.Domain.Model
 {
     public class CategoryType
     {

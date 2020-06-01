@@ -1,15 +1,17 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Catalog.API.Model
+namespace Catalog.Domain.Model
 {
-    public class CatalogItem
+    public abstract class CatalogItem
     {
-        [BsonId]
-        [BsonIgnoreIfDefault]
-        [BsonRepresentation(BsonType.ObjectId)]
+        public CatalogItem()
+        {
+            Department = new DepartmentType();
+            Categories = new List<CategoryType>();
+            Media = new List<MediaContent>();
+            Reviews = new List<CustomerReview>();
+        }
+
         public string Id { get; set; }
 
         public string Name { get; set; }
@@ -22,7 +24,7 @@ namespace Catalog.API.Model
 
         public List<CategoryType> Categories { get; set; }
 
-        public List<CatalogImage> Images { get; set; }
+        public List<MediaContent> Media { get; set; }
 
         public List<CustomerReview> Reviews { get; set; }
     }

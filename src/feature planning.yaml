@@ -1,0 +1,44 @@
+Features:
+    Catalogs:
+        Books:
+        Movies:
+        Music:
+        
+    Landing page:
+        best deals for you:v2
+        recommendations across departments: v2
+        browsing history: v2
+        search bar:
+            across departments:
+            by department:
+        
+    search results:
+        List results:
+        Pagination:
+    
+    Details Page:
+        add to basket:
+        checkout:
+            address:
+            payment:
+            Review items and delivery:
+            Buy Now:
+            
+    Basket:
+        list with edits:
+        
+
+    Your Orders:
+        orders list:
+        order details:
+        
+    Login:
+        external google/fb/twitter:
+
+    customer reviews:
+
+    Music:v2
+        spotify like service:
+
+    Movies:v2
+        Netflix like service:

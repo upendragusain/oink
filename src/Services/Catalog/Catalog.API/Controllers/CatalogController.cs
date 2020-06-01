@@ -1,8 +1,6 @@
-﻿using Catalog.API.Infrastructure;
-using Catalog.API.Model;
-using Catalog.API.ViewModel;
+﻿using Catalog.API.Dto;
+using Catalog.API.Infrastructure.Respositories;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -12,17 +10,17 @@ namespace Catalog.API.Controllers
     [ApiController]
     public class CatalogController : ControllerBase
     {
-        private readonly BookReadDataContext _context;
-        public CatalogController(BookReadDataContext context)
+        private readonly ICatalogBooksRepository _catalogBooksRepository;
+        public CatalogController(ICatalogBooksRepository catalogBooksRepository)
         {
-            _context = context;
+            _catalogBooksRepository = catalogBooksRepository;
         }
 
         [HttpGet]
         [Route("items")]
-        [ProducesResponseType(typeof(PaginatedItemsViewModel<BookViewModel>),(int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PaginatedItems<Domain.Model.Book>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ItemsAsync(
-            [FromQuery]int pageSize = 10, 
+            [FromQuery]int pageSize = 10,
             [FromQuery]int pageIndex = 1,
             [FromQuery]string searchTerm = null)
         {
@@ -35,15 +33,13 @@ namespace Catalog.API.Controllers
             if (pageIndex <= 0)
                 pageIndex = 1;
 
-            var totalItems = await _context.GetAllDocumentsCountAsync(searchTerm);
+            var totalItems = await _catalogBooksRepository.GetTotalCountAsync(searchTerm);
 
-            var itemsOnPage = await _context.GetDocumentsForAPage(
+            var itemsOnPage = await _catalogBooksRepository.GetPageAsync(
                 pageSize, pageIndex, searchTerm);
 
-            var books = itemsOnPage.Select(_ => MapToBookViewModel(_));
-
-            var model = new PaginatedItemsViewModel<BookViewModel>(
-                pageIndex, pageSize, totalItems, books);
+            var model = new PaginatedItems<Domain.Model.Book>(
+                pageIndex, pageSize, totalItems, itemsOnPage);
 
             return Ok(model);
         }
@@ -52,34 +48,20 @@ namespace Catalog.API.Controllers
         [Route("items/{id}")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(BookViewModel), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<BookViewModel>> ItemByIdAsync(string id)
+        [ProducesResponseType(typeof(Domain.Model.Book), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<Domain.Model.Book>> ItemByIdAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest();
             }
 
-            var item = await _context.GetSingleOrDefaultAsync(id);
+            var item = await _catalogBooksRepository.GetAsync(id);
 
-            return item != null ? MapToBookViewModel(item) 
-                : (ActionResult<BookViewModel>) NotFound();
-        }
+            if (item == null)
+                return NotFound();
 
-        private BookViewModel MapToBookViewModel(CatalogItem catalogItem)
-        {
-            var book = (Book)catalogItem;
-            return new BookViewModel()
-            {
-                AuthorName = book.AuthorName,
-                Id = book.Id,
-                Name = book.Name,
-                Price = book.Price,
-                Description = book.Description,
-                Publisher = book.Publisher,
-                ImageUrl = book.Images?.FirstOrDefault()?.Url,
-                //ImageContent = book.Images?.FirstOrDefault()?.Content
-            };
+            return item;
         }
     }
 }

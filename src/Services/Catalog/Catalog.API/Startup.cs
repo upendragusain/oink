@@ -1,11 +1,17 @@
-using Catalog.API.Infrastructure;
+using Catalog.API.Dto;
+using Catalog.API.Infrastructure.DataContexts;
+using Catalog.API.Infrastructure.Respositories;
+using Catalog.Domain.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using Serilog;
+using System;
 
 namespace Catalog.API
 {
@@ -37,7 +43,22 @@ namespace Catalog.API
             });
 
             services.Configure<CatalogSettings>(Configuration);
-            services.AddScoped<BookReadDataContext, BookReadDataContext>();
+
+            services.AddTransient<ICatalogBooksRepository, CatalogBooksRepository>();
+            services.AddTransient<CatalogBooksReadDataContext>();
+
+            BsonClassMap.RegisterClassMap<Product>(cm =>
+            {
+                cm.AutoMap();
+                cm.SetIgnoreExtraElements(true);
+                //cm.MapMember(c => c.Images).SetSerializer(new ImagesSerializer());
+            });
+
+            BsonClassMap.RegisterClassMap<Dto.Book>(cm =>
+            {
+                cm.AutoMap();
+                cm.SetIgnoreExtraElements(true);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

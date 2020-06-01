@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Catalog.API.ViewModel
+namespace Catalog.API.Dto
 {
-    public class PaginatedItemsViewModel<TEntity> where TEntity : class
+    public class PaginatedItems<TEntity> where TEntity : class
     {
         public int PageIndex { get; private set; }
 
@@ -12,7 +12,7 @@ namespace Catalog.API.ViewModel
 
         public IEnumerable<TEntity> Data { get; private set; }
 
-        public PaginatedItemsViewModel(
+        public PaginatedItems(
             int pageIndex, 
             int pageSize, 
             long count, 
