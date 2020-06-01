@@ -8,7 +8,7 @@
            asp-controller="books"
            asp-action="Detail"
            asp-route-bookId="@Model.Id">
-                <img src="@Model.ImageUrl"/>
+                <img src="@Model.Media.FirstOrDefault()?.Url"/>
         </a>
     </div>
 <div class="col-sm-9">

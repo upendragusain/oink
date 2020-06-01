@@ -1,4 +1,7 @@
-﻿namespace WebMVC.Models
+﻿using Catalog.Domain.Model;
+using System.Collections.Generic;
+
+namespace WebMVC.Models
 {
     public class BookDetailViewModel
     {
@@ -14,9 +17,12 @@
 
         public string Publisher { get; set; }
 
-        public string ImageUrl { get; set; }
+        public DepartmentType Department { get; set; }
 
-        //public byte[] ImageContent { get; set; }
+        public List<CategoryType> Categories { get; set; }
 
+        public List<MediaContent> Media { get; set; }
+
+        public List<CustomerReview> Reviews { get; set; }
     }
 }

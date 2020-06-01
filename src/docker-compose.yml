@@ -11,3 +11,9 @@ services:
       dockerfile: Services/Catalog/Catalog.API/Dockerfile
     depends_on:
       - seq
+
+  webmvc:
+    image: ${DOCKER_REGISTRY-}webmvc
+    build:
+      context: .
+      dockerfile: "Web Apps/WebMVC/Dockerfile"

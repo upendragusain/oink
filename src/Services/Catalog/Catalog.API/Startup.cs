@@ -1,7 +1,6 @@
 using Catalog.API.Dto;
 using Catalog.API.Infrastructure.DataContexts;
 using Catalog.API.Infrastructure.Respositories;
-using Catalog.Domain.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,9 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
 using Serilog;
-using System;
 
 namespace Catalog.API
 {
@@ -79,7 +76,7 @@ namespace Catalog.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Catalog V1");
             });
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
