@@ -1,14 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Basket.API.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 namespace Basket.API
 {
@@ -25,6 +23,29 @@ namespace Basket.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSwaggerGen(options =>
+            {
+                options.DescribeAllEnumsAsStrings();
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "oink - Basket HTTP API",
+                    Version = "v1",
+                    Description = "The Basket Service HTTP API"
+                });
+            });
+
+            services.Configure<BasketSettings>(Configuration);
+
+            services.AddSingleton<ConnectionMultiplexer>(sp => 
+            {
+                var settings = sp.GetRequiredService<IOptions<BasketSettings>>().Value;
+                var configuration = ConfigurationOptions.Parse(settings.ConnectionString, true);
+                //configuration.ResolveDns
+
+                return ConnectionMultiplexer.Connect(configuration);
+            });
+
+            services.AddTransient<IBasketRepository, RedisBasketRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +55,13 @@ namespace Basket.API
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Basket V1");
+            });
 
             app.UseRouting();
 
