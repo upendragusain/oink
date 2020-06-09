@@ -9,5 +9,7 @@ namespace Basket.API.Repositories
 
         Task<CustomerBasket> UpdateBasketAsync(CustomerBasket customerBasket);
 
+        Task DeleteBasketAsync(string customerId);
+
     }
 }

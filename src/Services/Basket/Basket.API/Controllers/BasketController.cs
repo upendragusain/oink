@@ -16,13 +16,13 @@ namespace Basket.API.Controllers
             _basketRespository = basketRespository;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{customerId}")]
         [ProducesResponseType(typeof(CustomerBasket), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<CustomerBasket>> GetBasketByIdAsync(string id)
+        public async Task<ActionResult<CustomerBasket>> GetBasketByIdAsync(string customerId)
         {
-            var basket = await _basketRespository.GetBasketAsync(id);
+            var basket = await _basketRespository.GetBasketAsync(customerId);
 
-            return Ok(basket ?? new CustomerBasket(id));
+            return Ok(basket ?? new CustomerBasket(customerId));
         }
 
         [HttpPost]
@@ -30,6 +30,13 @@ namespace Basket.API.Controllers
         public async Task<ActionResult<CustomerBasket>> UpdateBasketAsync([FromBody]CustomerBasket value)
         {
             return Ok(await _basketRespository.UpdateBasketAsync(value));
+        }
+
+        [HttpDelete("{customerId}")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task DeleteBasketAsync(string customerId)
+        {
+            await _basketRespository.DeleteBasketAsync(customerId);
         }
     }
 }

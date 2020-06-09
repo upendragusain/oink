@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using StackExchange.Redis;
 
 namespace Basket.API
@@ -64,6 +65,8 @@ namespace Basket.API
             });
 
             app.UseRouting();
+
+            app.UseSerilogRequestLogging();
 
             app.UseAuthorization();
 

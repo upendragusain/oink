@@ -39,5 +39,10 @@ namespace Basket.API.Repositories
 
             return await GetBasketAsync(customerBasket.BuyerId);
         }
+
+        public async Task DeleteBasketAsync(string customerId)
+        {
+            await _database.KeyDeleteAsync(customerId);
+        }
     }
 }
