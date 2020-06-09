@@ -352,3 +352,5 @@ MigrationBackup/
 src/Services/Catalog/Catalog.API/logs.json
 
 src/Services/Catalog/WebCrawler/logs2020060111.json
+
+src/dump.rdb

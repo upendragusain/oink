@@ -29,3 +29,5 @@ services:
     build:
       context: .
       dockerfile: "Web Apps/WebMVC/Dockerfile"
+    depends_on:
+      - basket.api

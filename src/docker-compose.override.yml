@@ -27,7 +27,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionString=${OINK_AZURE_REDIS_BASKET_DB:-basketdata}
+      - ConnectionString=basketdata
     ports:
       - "5012:80"
     volumes:
@@ -37,9 +37,7 @@ services:
   webmvc:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
+      - CatalogUrl=http://docker.for.win.localhost:5011
     ports:
       - "5001:80"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
