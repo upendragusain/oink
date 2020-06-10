@@ -1,4 +1,8 @@
+using Autofac;
+using Basket.API.IntegrationEvents.EventHandling;
 using Basket.API.Repositories;
+using EventBus;
+using EventBusRabbitMQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 using Serilog;
 using StackExchange.Redis;
 
@@ -37,7 +42,7 @@ namespace Basket.API
 
             services.Configure<BasketSettings>(Configuration);
 
-            services.AddSingleton<ConnectionMultiplexer>(sp => 
+            services.AddSingleton<ConnectionMultiplexer>(sp =>
             {
                 var settings = sp.GetRequiredService<IOptions<BasketSettings>>().Value;
                 var configuration = ConfigurationOptions.Parse(settings.ConnectionString, true);
@@ -47,6 +52,8 @@ namespace Basket.API
             });
 
             services.AddTransient<IBasketRepository, RedisBasketRepository>();
+
+            RegisterEventBus(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +81,44 @@ namespace Basket.API
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void RegisterEventBus(IServiceCollection services)
+        {
+            var subscriptionClientName = Configuration["SubscriptionClientName"];
+
+            services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
+            {
+                var factory = new ConnectionFactory()
+                {
+                    HostName = Configuration["EventBusConnection"],
+                    DispatchConsumersAsync = true
+                };
+
+                if (!string.IsNullOrEmpty(Configuration["EventBusUserName"]))
+                {
+                    factory.UserName = Configuration["EventBusUserName"];
+                }
+
+                if (!string.IsNullOrEmpty(Configuration["EventBusPassword"]))
+                {
+                    factory.Password = Configuration["EventBusPassword"];
+                }
+
+                return new DefaultRabbitMQPersistentConnection(factory);
+            });
+
+            services.AddSingleton<IEventBus, EventBusRabbitMQ.EventBusRabbitMQ>(sp =>
+            {
+                var rabbitMQPersistentConnection = sp.GetRequiredService<IRabbitMQPersistentConnection>();
+                var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
+               
+                return new EventBusRabbitMQ.EventBusRabbitMQ(rabbitMQPersistentConnection, 
+                    iLifetimeScope,  
+                    subscriptionClientName);
+            });
+
+            services.AddTransient<OrderStartedIntegrationEventHandler>();
         }
     }
 }
