@@ -7,6 +7,9 @@ services:
   basketdata:
     image: redis:alpine
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
@@ -23,6 +26,7 @@ services:
     depends_on:
       - seq
       - basketdata
+      - rabbitmq
 
   webmvc:
     image: ${DOCKER_REGISTRY-}webmvc

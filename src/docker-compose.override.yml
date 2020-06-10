@@ -13,6 +13,11 @@ services:
     volumes:
       - ./:/data
 
+  rabbitmq:
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
   catalog.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -28,6 +33,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionString=basketdata
+      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
     ports:
       - "5012:80"
     volumes:
