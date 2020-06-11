@@ -24,14 +24,14 @@ namespace Basket.API.Controllers
             _eventBus = eventBus;
         }
 
-        [HttpGet("{customerId}")]
+        [HttpGet("{userId}")]
         [ProducesResponseType(typeof(CustomerBasket), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<CustomerBasket>> GetBasketByIdAsync(
-            string customerId)
+            string userId)
         {
-            var basket = await _basketRespository.GetBasketAsync(customerId);
+            var basket = await _basketRespository.GetBasketAsync(userId);
 
-            return Ok(basket ?? new CustomerBasket(customerId));
+            return Ok(basket ?? new CustomerBasket(userId));
         }
 
         [HttpPost]
@@ -42,11 +42,11 @@ namespace Basket.API.Controllers
             return Ok(await _basketRespository.UpdateBasketAsync(value));
         }
 
-        [HttpDelete("{customerId}")]
+        [HttpDelete("{userId}")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task DeleteBasketAsync(string customerId)
+        public async Task DeleteBasketAsync(string userId)
         {
-            await _basketRespository.DeleteBasketAsync(customerId);
+            await _basketRespository.DeleteBasketAsync(userId);
         }
 
         [Route("checkout")]
@@ -79,7 +79,8 @@ namespace Basket.API.Controllers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "ERROR Publishing integration event: {IntegrationEventId} from {AppName}", eventMessage.Id, Program.AppName);
+                Log.Error(ex, "ERROR Publishing integration event: {IntegrationEventId} from {AppName}",
+                    eventMessage.Id, Program.AppName);
 
                 throw;
             }

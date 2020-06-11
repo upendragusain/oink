@@ -17,9 +17,9 @@ namespace Basket.API.Repositories
             _database = _connectionMultiplexer.GetDatabase();
         }
 
-        public async Task<CustomerBasket> GetBasketAsync(string customerId)
+        public async Task<CustomerBasket> GetBasketAsync(string userId)
         {
-            var customerBasket = await _database.StringGetAsync(customerId);
+            var customerBasket = await _database.StringGetAsync(userId);
 
             if (customerBasket.IsNullOrEmpty)
                 return null;
@@ -40,9 +40,11 @@ namespace Basket.API.Repositories
             return await GetBasketAsync(customerBasket.BuyerId);
         }
 
-        public async Task DeleteBasketAsync(string customerId)
+        public async Task DeleteBasketAsync(string userId)
         {
-            await _database.KeyDeleteAsync(customerId);
+            Log.Information("Deleting basket for user: {0}",
+                userId);
+            await _database.KeyDeleteAsync(userId);
         }
     }
 }

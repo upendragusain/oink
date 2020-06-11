@@ -1,5 +1,6 @@
 using Autofac;
 using Basket.API.IntegrationEvents.EventHandling;
+using Basket.API.IntegrationEvents.Events;
 using Basket.API.Repositories;
 using EventBus;
 using EventBusRabbitMQ;
@@ -24,6 +25,8 @@ namespace Basket.API
         }
 
         public IConfiguration Configuration { get; }
+
+        public ILifetimeScope AutofacContainer { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -53,7 +56,20 @@ namespace Basket.API
 
             services.AddTransient<IBasketRepository, RedisBasketRepository>();
 
+            services.AddTransient<UserCheckoutAcceptedIntegrationEventHandler>();
+
             RegisterEventBus(services);
+        }
+
+        // ConfigureContainer is where you can register things directly
+        // with Autofac. This runs after ConfigureServices so the things
+        // here will override registrations made in ConfigureServices.
+        // Don't build the container; that gets done for you by the factory.
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // Register your own things directly with Autofac, like:
+            //builder.RegisterModule(new MyApplicationModule());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -81,6 +97,8 @@ namespace Basket.API
             {
                 endpoints.MapControllers();
             });
+
+            ConfigureEventBus(app);
         }
 
         private void RegisterEventBus(IServiceCollection services)
@@ -112,13 +130,21 @@ namespace Basket.API
             {
                 var rabbitMQPersistentConnection = sp.GetRequiredService<IRabbitMQPersistentConnection>();
                 var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
-               
-                return new EventBusRabbitMQ.EventBusRabbitMQ(rabbitMQPersistentConnection, 
-                    iLifetimeScope,  
+
+                return new EventBusRabbitMQ.EventBusRabbitMQ(rabbitMQPersistentConnection,
+                    iLifetimeScope,
                     subscriptionClientName);
             });
 
-            services.AddTransient<OrderStartedIntegrationEventHandler>();
+            services.AddTransient<UserCheckoutAcceptedIntegrationEventHandler>();
+        }
+
+        private void ConfigureEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+
+            eventBus.Subscribe<UserCheckoutAcceptedIntegrationEvent, UserCheckoutAcceptedIntegrationEventHandler>();
+
         }
     }
 }

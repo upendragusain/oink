@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +19,7 @@ namespace EventBusRabbitMQ
         private readonly ILifetimeScope _autofac;
         private readonly string AUTOFAC_SCOPE_NAME = "oink_event_bus";
 
+        private IModel _consumerChannel;
         public EventBusRabbitMQ(IRabbitMQPersistentConnection rabbitMQPersistentConnection,
             ILifetimeScope autofac,
             string queueName)
@@ -27,6 +27,31 @@ namespace EventBusRabbitMQ
             _rabbitMQPersistentConnection = rabbitMQPersistentConnection;
             _queueName = queueName;
             _autofac = autofac;
+
+            _consumerChannel = CreateConsumerChannel();
+        }
+
+        private IModel CreateConsumerChannel()
+        {
+            if (!_rabbitMQPersistentConnection.IsConnected)
+            {
+                _rabbitMQPersistentConnection.TryConnect();
+            }
+
+            Log.Information("Creating RabbitMQ consumer channel");
+
+            var channel = _rabbitMQPersistentConnection.CreateModel();
+
+            channel.ExchangeDeclare(exchange: BROKER_NAME,
+                                    type: "direct");
+
+            channel.QueueDeclare(queue: _queueName,
+                                 durable: true,
+                                 exclusive: false,
+                                 autoDelete: false,
+                                 arguments: null);
+
+            return channel;
         }
 
         public void Publish(IntegrationEvent @event)
@@ -80,38 +105,30 @@ namespace EventBusRabbitMQ
 
             using (var channel = _rabbitMQPersistentConnection.CreateModel())
             {
+                Log.Information("Binding to queue: {0} with routingKey {1}",
+                    _queueName, eventName);
+
                 channel.QueueBind(queue: _queueName,
                     exchange: BROKER_NAME,
                     routingKey: eventName);
 
                 Log.Information("Waiting for messages.");
+            }
 
-                var consumer = new AsyncEventingBasicConsumer(channel);
+            if (_consumerChannel != null)
+            {
+                var consumer = new AsyncEventingBasicConsumer(_consumerChannel);
 
-                consumer.Received += async (model, eventArgs) =>
-                {
-                    var eventType = typeof(T);
-                    var body = eventArgs.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body.ToArray());
-                    var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                consumer.Received += ProcessEvent<T, TH>;
 
-                    Log.Information("Received new message {0} for {1} - {2}", 
-                        message, integrationEvent, concreteType);
-
-                    using (var scope = _autofac.BeginLifetimeScope(AUTOFAC_SCOPE_NAME))
-                    {
-                        var handlerType = typeof(TH);
-                        var handler = scope.ResolveOptional(handlerType);
-                        await (Task)concreteType.GetMethod("Handle")
-                            .Invoke(handler, new object[] { integrationEvent });
-                    }
-                };
-
-                channel.BasicConsume(
+                _consumerChannel.BasicConsume(
                     queue: _queueName,
                     autoAck: false,
                     consumer: consumer);
+            }
+            else
+            {
+                Log.Error("StartBasicConsume can't call on _consumerChannel == null");
             }
         }
 
@@ -129,6 +146,25 @@ namespace EventBusRabbitMQ
                 channel.QueueUnbind(queue: _queueName,
                     exchange: BROKER_NAME,
                     routingKey: eventName);
+            }
+        }
+
+        private async Task ProcessEvent<T, TH>(object sender, BasicDeliverEventArgs eventArgs)
+        {
+            var eventName = eventArgs.RoutingKey;
+            var message = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
+
+            Log.Information("Processing RabbitMQ event: {EventName}", eventName);
+
+            using (var scope = _autofac.BeginLifetimeScope(AUTOFAC_SCOPE_NAME))
+            {
+                var handler = scope.ResolveOptional(typeof(TH));
+                var eventType = typeof(T);
+                var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+
+                await (Task)concreteType.GetMethod("Handle").Invoke(
+                    handler, new object[] { integrationEvent });
             }
         }
     }

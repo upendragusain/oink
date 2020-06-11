@@ -1,9 +1,6 @@
 ﻿using Basket.API.Model;
 using EventBus.Events;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Basket.API.IntegrationEvents.Events
 {
@@ -41,9 +38,12 @@ namespace Basket.API.IntegrationEvents.Events
 
         public CustomerBasket Basket { get; }
 
-        public UserCheckoutAcceptedIntegrationEvent(string userId, string userName, string city, string street,
-            string state, string country, string zipCode, string cardNumber, string cardHolderName,
-            DateTime cardExpiration, string cardSecurityNumber, int cardTypeId, string buyer, Guid requestId,
+        public UserCheckoutAcceptedIntegrationEvent(string userId, string userName, 
+            string city, string street,
+            string state, string country, string zipCode, 
+            string cardNumber, string cardHolderName,
+            DateTime cardExpiration, string cardSecurityNumber, 
+            int cardTypeId, string buyer, Guid requestId,
             CustomerBasket basket)
         {
             UserId = userId;
